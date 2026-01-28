@@ -48,13 +48,17 @@
 
 % Admonition box colors
 \definecolor{warningbg}{RGB}{255, 243, 205}
-\definecolor{warningborder}{RGB}{255, 193, 7}
+\definecolor{warningborder}{RGB}{255, 100, 7}
 \definecolor{tipbg}{RGB}{209, 236, 241}
 \definecolor{tipborder}{RGB}{23, 162, 184}
 \definecolor{notebg}{RGB}{232, 245, 233}
 \definecolor{noteborder}{RGB}{76, 175, 80}
 \definecolor{osbg}{RGB}{232, 234, 246}
 \definecolor{osborder}{RGB}{63, 81, 181}
+\definecolor{labbg}{RGB}{255, 248, 225}
+\definecolor{labborder}{RGB}{150, 100, 50}
+\definecolor{ponderbg}{RGB}{243, 229, 245}
+\definecolor{ponderborder}{RGB}{156, 39, 176}
 
 % ============================================================================
 % CODE LISTINGS
@@ -190,7 +194,7 @@
     enhanced,
     colback=osbg,
     colframe=osborder,
-    coltitle=black,
+    coltitle=white,
     fonttitle=\bfseries,
     title={\textbf{OS Differences}},
     left=8pt,
@@ -202,13 +206,11 @@
 }
 
 % Lab example box (for chemistry/science examples)
-\definecolor{labbg}{RGB}{255, 248, 225}
-\definecolor{labborder}{RGB}{255, 152, 0}
 \newtcolorbox{labexample}[1][]{
     enhanced,
     colback=labbg,
     colframe=labborder,
-    coltitle=black,
+    coltitle=white,
     fonttitle=\bfseries,
     title={\textbf{Lab Example}},
     left=8pt,
@@ -220,13 +222,11 @@
 }
 
 % Things to ponder box
-\definecolor{ponderbg}{RGB}{243, 229, 245}
-\definecolor{ponderborder}{RGB}{156, 39, 176}
 \newtcolorbox{ponder}[1][]{
     enhanced,
     colback=ponderbg,
     colframe=ponderborder,
-    coltitle=black,
+    coltitle=white,
     fonttitle=\bfseries,
     title={\textbf{Things to Ponder}},
     left=8pt,
