@@ -530,29 +530,38 @@ The best way to start is with a simple text editor. This might seem primitive, b
 \end{itemize}
 
 \begin{tip}
-I recommend starting with a basic text editor for your first few scripts. This builds understanding of what Python files really are. You won't develop false beliefs like ``I need special software for this script to work.'' Once you're comfortable with the basics, you can upgrade to a more powerful tool.
+I recommend starting with a basic text editor for your first few scripts. This builds understanding of what Python files really are, and how python really works. You won't develop false beliefs like ``I need to run my script from vs code for it to work.'' Once you're comfortable with the basics, you can upgrade to a more powerful tool.
 \end{tip}
 
 \subsection{Upgrading Later: Integrated Development Environments}
 
-An IDE (Integrated Development Environment) is an editor designed specifically for programming. It provides helpful features: syntax highlighting, automatic error detection, tools to explore variables while your code runs, and more. When you're ready to upgrade from a basic text editor, here are the options.
+An IDE (Integrated Development Environment) is an editor designed specifically for programming. It provides helpful features: syntax highlighting, automatic error detection, tools to explore variables while your code runs, and more. When you're ready to upgrade from a basic text editor, here are some popular options.
 
-\textbf{Spyder:} Designed specifically for scientific Python. If you've used RStudio, Spyder will feel familiar---it has a similar layout with your code on one side and a variable explorer on the other. It shows you the values of all your variables as your code runs, which is incredibly helpful for learning and for data analysis.
+\textbf{Spyder:} Designed specifically for scientists and data analysts using Python. If you've used RStudio, Spyder will feel familiar---it has a similar layout panels to show your script, an interactive console, a variable explorer, help files, a plot panel, and so on.
 
 Install Spyder with pip (make sure your virtual environment is activated):
 
 \begin{lstlisting}[style=shellstyle]
 pip install spyder
-spyder    # to launch
 \end{lstlisting}
 
-Or download it from \url{https://www.spyder-ide.org/}.
+and then simply:
 
-\textbf{Visual Studio Code (VS Code):} Made by Microsoft, free, and extremely popular. It's a general-purpose programming editor used for many languages. Download from \url{https://code.visualstudio.com/}. After installing, you'll need to add the Python extension: click the Extensions icon (four squares) in the sidebar, search for ``Python,'' and install it.
+\begin{lstlisting}[style=shellstyle]
+spyder
+\end{lstlisting}
+
+to launch the IDE's GUI (Graphical User Interface). Alternatively, you could download it from \url{https://www.spyder-ide.org/} and install it that way, but installing and launching from within your virtual environment can prevent headaches.
+
+\textbf{Visual Studio Code (VS Code):} Made by Microsoft, free, and extremely popular in the broader software development community (though not required). It is a general-purpose programming editor used for many languages. Download from \url{https://code.visualstudio.com/}. After installing, you'll need to add the Python extension: click the Extensions icon (four squares) in the sidebar, search for ``Python,'' and install it.
+
+\textbf{No IDE:} A plain old text editor like nano, vim, micro (linux), or notepad++, is perfectly serviceable. My personal website runs via python and was written entirely in terminal using micro on my phone. Some of my proudest research results came from scripts I wrote on the train, ideas I had in the moment and would surely forget. This again was done via my phone. 
 
 \begin{note}
 VS Code is a generalist tool, whereas Spyder is a specialist. VS Code requires significant manual configuration to match Spyder's out-of-the-box scientific features. I recommend holding off on VS Code until you encounter a specific need that Spyder cannot fulfill.
 \end{note}
+
+\textbf{No IDE:} A plain old text editor like \texttt{nano}, \texttt{vim}, or Notepad++ is perfectly serviceable. In fact, many scientists eventually work on remote supercomputers or cloud servers where graphical interfaces (like Spyder) aren't available. If you are comfortable editing plain text, you can work anywhere---on a powerful cluster, a colleague's laptop, or even your phone while commuting. The power lies in your code, not the tool used to write it. Challenge yourself to text-editor-only projects from time to time.
 
 % ----------------------------------------------------------------------------
 \section{Chapter Summary}
