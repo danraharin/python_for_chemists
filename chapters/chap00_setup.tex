@@ -263,7 +263,7 @@ Hello, scientist!
 
 Here we're using \py{print()}, which is a \emph{function}. A function is a named action---you give it some input (inside the parentheses), and it does something with it. The \py{print()} function displays whatever you give it on screen. The quotes around the text mark it as a \emph{string}---a piece of text data, rather than a command or variable name. We'll learn much more about functions and strings soon.
 
-To exit the REPL:
+To exit the REPL, simply use the exit function with no input:
 
 \begin{lstlisting}
 >>> exit()
@@ -279,21 +279,23 @@ What happens if you type \py{print(Hello)} without the quotes? Try it and read t
 \section{Virtual Environments}
 \label{sec:venv}
 
-This section might seem bureaucratic, but it solves real problems. Pay attention.
+This section might seem bureaucratic, but it solves real problems. Paying attention here will save you many headaches in the future, while making a lot of public code more accessible to you.
 
 \subsection{The Problem}
 
-Python by itself can do basic things, but its real power comes from \emph{packages} (also called \emph{libraries})---collections of code that other people have written and shared. Think of them like apps for your phone: Python is the operating system, and packages add new abilities. NumPy does numerical computing, Matplotlib makes plots, Pandas handles data tables. You'll install many of them.
+Python by itself can do basic things, but its real power comes from \emph{packages} (also called \emph{libraries})---collections of code that other people have written and shared. Think of them like apps for your phone: Python is the operating system, and packages add new abilities.
 
-But here's the problem: different projects might need different versions of the same package. Project A needs NumPy 1.24; Project B needs NumPy 1.21 because it works with an older package that doesn't support the new version.
+While you \emph{could} write your own statistical analysis tools from scratch, it is far more efficient to leverage the vast ecosystem of tools made available for free. For example, \textbf{NumPy} handles numerical computing, \textbf{Matplotlib} makes plots, and \textbf{Pandas} manages data tables. A major strength of Python is this community ecosystem. You'll install and use many of them.
 
-If you install packages globally (available everywhere on your computer), you can only have one version. Updating for Project A breaks Project B. This is called ``dependency hell,'' and it's why scientists often say ``I reinstalled Python and now nothing works.''
+But here's the problem: different projects might need different versions of the same package. Project A needs a package called \py{NumPy} at version 1.24 because it has a new and improved function; Project B needs \py{NumPy} version 1.21 because it uses a depreciated function that isn't support the new version.
+
+If you install packages globally (available everywhere on your computer), you can only have one version. Updating for Project A breaks Project B and vice-versa. This is called ``dependency hell,'' and it's why scientists often say ``I reinstalled Python and now nothing works.''
 
 \subsection{The Solution}
 
 Virtual environments. Each project gets its own isolated Python environment with its own packages. Project A's environment has NumPy 1.24. Project B's environment has NumPy 1.21. They don't interfere with each other.
 
-Think of it like having separate lab benches for different experiments. You wouldn't mix reagents from two different projects on the same bench.
+There are several external tools that manage environments (e.g., Conda, Poetry, Pipenv). While I highly recommend looking into \py{uv} (by Astral) once you are comfortable, this book focuses on Python's standard, built-in tools. Mastering these first ensures you understand the core mechanics without needing to install extra software, and provides the foundation needed to effectively use power tools like \py{uv} later.
 
 \subsection{Creating a Virtual Environment}
 
