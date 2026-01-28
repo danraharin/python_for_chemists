@@ -33,14 +33,6 @@ latexmk -pdf main.tex
 **Clean auxiliary files:**
 ```bash
 latexmk -c
-# or manually:
-rm -f *.aux *.log *.toc *.out *.fls *.fdb_latexmk
-```
-
-**Or all in one, build and cleanup:**
-
-```bash
-latexmk -pdf -c main.tex
 ```
 
 ## File Organization
@@ -148,7 +140,7 @@ Inline code commands:
 
 ## License
 
-[Add license information here]
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Author
 
