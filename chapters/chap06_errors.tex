@@ -205,19 +205,41 @@ else:
 
 \subsection{finally: Code That Always Runs}
 
+The \py{finally} block runs whether or not an exception occurred---useful for cleanup operations. However, you must be careful: if an exception occurs early, variables you expect to exist might not be defined.
+
 \begin{lstlisting}
+# Buggy version - if open() fails, 'file' doesn't exist!
+try:
+    file = open("data.txt")
+    process(file)
+finally:
+    file.close()  # NameError if open() failed!
+\end{lstlisting}
+
+The safe pattern initializes the variable first:
+
+\begin{lstlisting}
+file = None
 try:
     file = open("data.txt")
     process(file)
 except FileNotFoundError:
     print("File not found")
 finally:
-	file.close() 
+    if file:
+        file.close()
     print("Cleanup complete")
-    # This runs whether or not an exception occurred
 \end{lstlisting}
 
-\py{finally} is useful for cleanup operations that must happen regardless of success or failure.
+\begin{tip}
+For files specifically, the \py{with} statement (Chapter~\ref{chap:files}) handles this automatically and is always preferred:
+\begin{lstlisting}
+with open("data.txt") as file:
+    process(file)
+# File is automatically closed, even if an exception occurred
+\end{lstlisting}
+The \py{try}/\py{finally} pattern shown above is mainly useful for resources that don't support \py{with}, or when you need custom cleanup logic.
+\end{tip}
 
 \begin{labexample}
 A robust data loading function:
