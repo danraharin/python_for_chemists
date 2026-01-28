@@ -176,6 +176,41 @@ def func(a, c, b=1):    # OK - default parameter is last
 \end{lstlisting}
 \end{warning}
 
+\subsection{The Mutable Default Argument Trap}
+\label{subsec:mutable-defaults}
+
+One of Python's most notorious gotchas involves mutable default arguments. Consider this function:
+
+\begin{lstlisting}
+def add_reading(reading, readings=[]):
+    readings.append(reading)
+    return readings
+
+# Seems fine at first...
+print(add_reading(1.5))   # [1.5]
+print(add_reading(2.3))   # [1.5, 2.3]  -- wait, what?
+print(add_reading(3.1))   # [1.5, 2.3, 3.1]  -- it remembers!
+\end{lstlisting}
+
+The list accumulates values across calls! This happens because the default value \py{[]} is created \emph{once} when the function is defined, not each time it's called. Every call shares the same list object.
+
+Recall from Chapter~\ref{chap:basics} (Section~\ref{subsec:aliasing}) that variables are labels pointing to objects. The default \py{[]} creates one list object, and every call that uses the default gets that same object.
+
+\begin{tip}
+The fix is to use \py{None} as the default and create the list inside the function:
+\begin{lstlisting}
+def add_reading(reading, readings=None):
+    if readings is None:
+        readings = []    # create a NEW list each time
+    readings.append(reading)
+    return readings
+
+print(add_reading(1.5))   # [1.5]
+print(add_reading(2.3))   # [2.3] -- fresh list each time
+\end{lstlisting}
+This pattern applies to any mutable default: lists, dictionaries, sets, or custom objects.
+\end{tip}
+
 % ----------------------------------------------------------------------------
 \section{Keyword Arguments}
 \label{sec:keyword-args}
@@ -211,6 +246,70 @@ result = analyze_spectrum(
     normalize=True,
     subtract_baseline=False
 )
+\end{lstlisting}
+
+% ----------------------------------------------------------------------------
+\section{Flexible Arguments: *args and **kwargs}
+\label{sec:args-kwargs}
+
+When reading library documentation, you'll often see function signatures like:
+
+\begin{lstlisting}
+def plot(x, y, *args, **kwargs):
+    ...
+\end{lstlisting}
+
+What do the asterisks mean?
+
+\subsection{*args: Variable Positional Arguments}
+
+A parameter prefixed with \py{*} collects any extra positional arguments into a tuple:
+
+\begin{lstlisting}
+def calculate_mean(*values):
+    """Calculate mean of any number of values."""
+    return sum(values) / len(values)
+
+print(calculate_mean(1, 2, 3))           # 2.0
+print(calculate_mean(10, 20, 30, 40))    # 25.0
+\end{lstlisting}
+
+The name \py{args} is a convention---you could use any name, but \py{*args} is standard.
+
+\subsection{**kwargs: Variable Keyword Arguments}
+
+A parameter prefixed with \py{**} collects extra keyword arguments into a dictionary:
+
+\begin{lstlisting}
+def create_sample(name, **properties):
+    """Create a sample with arbitrary properties."""
+    print(f"Sample: {name}")
+    for key, value in properties.items():
+        print(f"  {key}: {value}")
+
+create_sample("S1", concentration=0.5, temperature=25, pH=7.2)
+# Output:
+# Sample: S1
+#   concentration: 0.5
+#   temperature: 25
+#   pH: 7.2
+\end{lstlisting}
+
+\subsection{Why This Matters}
+
+You'll rarely need to define functions with \py{*args} and \py{**kwargs} yourself, but you'll \emph{call} many library functions that use them. Understanding this syntax helps you:
+
+\begin{itemize}
+    \item Read documentation for libraries like Matplotlib or Pandas
+    \item Pass optional parameters through wrapper functions
+    \item Understand error messages about unexpected arguments
+\end{itemize}
+
+\begin{lstlisting}
+# Matplotlib's plot() accepts many optional keyword arguments
+import matplotlib.pyplot as plt
+plt.plot(x, y, color='red', linewidth=2, marker='o')
+# These extra arguments are collected by **kwargs
 \end{lstlisting}
 
 % ----------------------------------------------------------------------------
@@ -260,20 +359,37 @@ my_function()  # prints 10
 print(x)       # ERROR! x is not defined here
 \end{lstlisting}
 
-Variables defined outside functions are ``global'' and can be read from anywhere:
+Variables defined outside functions are ``global'' and can be \emph{read} from anywhere without special syntax:
 
 \begin{lstlisting}
 multiplier = 2  # global variable
 
 def double(x):
-	global multiplier # we do still need tell our function it should use the multiplyer variable from global when we mention multiplyer
-    return x * multiplier  # can read global variable
+    return x * multiplier  # reading global variable works fine
 
 print(double(5))  # prints 10
 \end{lstlisting}
 
+However, \emph{modifying} a global variable from inside a function requires the \py{global} keyword:
+
+\begin{lstlisting}
+counter = 0
+
+def increment_broken():
+    counter = counter + 1  # ERROR! Python thinks counter is local
+
+def increment_works():
+    global counter         # tell Python we mean the global variable
+    counter = counter + 1
+
+increment_works()
+print(counter)  # prints 1
+\end{lstlisting}
+
+Without \py{global}, Python assumes you're creating a new local variable. The error occurs because you're trying to read \py{counter} (on the right side of \py{=}) before assigning it locally.
+
 \begin{warning}
-Modifying global variables from inside functions requires the \py{global} keyword and is generally discouraged. It makes code harder to understand and debug. Instead, pass values as parameters and return results.
+Modifying global variables is generally discouraged---it makes code harder to understand and debug. Instead, pass values as parameters and return results:
 \begin{lstlisting}
 # Bad - modifies global state
 counter = 0
@@ -287,6 +403,7 @@ def increment(counter):
 
 counter = increment(counter)
 \end{lstlisting}
+Functions that don't modify global state are easier to test, reuse, and reason about.
 \end{warning}
 
 % ----------------------------------------------------------------------------
