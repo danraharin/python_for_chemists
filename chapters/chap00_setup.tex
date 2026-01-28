@@ -4,21 +4,21 @@
 \chapter{Setting Up Your Environment}
 \label{chap:setup}
 
-Before writing any code, you need a working Python installation and a sensible way to organize your files. This chapter covers both. It's tempting to skip ahead to ``real'' programming, but a broken setup will frustrate you later. Invest an hour now; save countless hours tracking down environment problems.
+Before writing any code, you need a working Python installation and a sensible way to organise your files. This chapter covers both. It's tempting to skip ahead to ``real'' programming, but a broken setup will frustrate you later. Invest an hour now; save countless hours tracking down environment problems.
 
 % ----------------------------------------------------------------------------
 \section{Why Scientists Program}
 \label{sec:why-program}
 
-You already know how to analyze data. You've used Excel, maybe Origin or Igor Pro. You can make graphs and calculate statistics. So why learn to program?
+You already know how to analyse data. You've used Excel, maybe Origin or Igor Pro. You can make graphs and calculate statistics. So why learn to program?
 
-\textbf{Reproducibility.} When you analyze data by clicking through menus, the process lives only in your memory. Three months later, a reviewer asks how you normalized those spectra. Good luck remembering which buttons you clicked. A \emph{script}---a text file containing instructions for the computer---documents every step. Run it again and you get exactly the same result.
+\textbf{Reproducibility.} When you analyse data by clicking through menus, the process lives only in your memory. Three months later, a reviewer asks how you normalised those spectra. Good luck remembering which buttons you clicked. A \emph{script}---a text file containing instructions for the computer---documents every step. Run it again and you get exactly the same result.
 
 \textbf{Automation.} You have 200 data files from a week of measurements. Processing them one by one takes hours. A script processes them in seconds---and doesn't make mistakes at file 187 because it's tired.
 
 \textbf{Flexibility.} Commercial software does what its developers anticipated. Your analysis might need something unusual: a custom baseline correction, a niche fitting function, or a way to merge data from three different instruments. With programming, you build exactly what you need.
 
-\textbf{Figures.} Publication-quality figures require control over every detail: axis labels, font sizes, color schemes, subplot layouts. Matplotlib gives you that control. Once you write the code for a figure style you like, every future paper uses the same polished look.
+\textbf{Figures.} Publication-quality figures require control over every detail: axis labels, font sizes, colour schemes, subplot layouts. Matplotlib gives you that control. Once you write the code for a figure style you like, every future paper uses the same polished look.
 
 \begin{labexample}
 Imagine you collect UV-Vis spectra weekly to monitor a reaction. Each measurement produces a file. By the end of the project, you have 50 files. A Python script can:
@@ -38,7 +38,7 @@ When your advisor asks ``What if we use a different baseline method?''---you cha
 
 Before installing anything, let's establish some habits that prevent future headaches.
 
-\subsection{Folder Organization}
+\subsection{Folder Organisation}
 
 Create a dedicated folder for your programming work. Don't scatter scripts across your Desktop, Downloads, and random project folders. Something like:
 
@@ -534,31 +534,24 @@ I recommend starting with a basic text editor for your first few scripts. This b
 \end{tip}
 
 \subsection{Upgrading Later: Integrated Development Environments}
+\label{subsec:ide}
+
+\begin{tip}
+If you are totally new to python, you can reduce the information overload by skipping this section for now---A good time to come back is after Chapter~\ref{chap:functions}. Don't worry, I'll remind you! Just keep checking the tips.
+\end{tip}
 
 An IDE (Integrated Development Environment) is an editor designed specifically for programming. It provides helpful features: syntax highlighting, automatic error detection, tools to explore variables while your code runs, and more. When you're ready to upgrade from a basic text editor, here are some popular options.
 
 \textbf{Spyder:} Designed specifically for scientists and data analysts using Python. If you've used RStudio, Spyder will feel familiar---it has a similar layout panels to show your script, an interactive console, a variable explorer, help files, a plot panel, and so on.
 
-Install Spyder with pip (make sure your virtual environment is activated):
-
-\begin{lstlisting}[style=shellstyle]
-pip install spyder
-\end{lstlisting}
-
-and then simply:
-
-\begin{lstlisting}[style=shellstyle]
-spyder
-\end{lstlisting}
-
-to launch the IDE's GUI (Graphical User Interface). Alternatively, you could download it from \url{https://www.spyder-ide.org/} and install it that way, but installing and launching from within your virtual environment can prevent headaches.
+You could download it from \url{https://www.spyder-ide.org/} and install it using familiar pathways. Alternatively, check out the install guide \url{https://docs.spyder-ide.org/current/installation.html} for options such as installing using the build in package manager \py{pip}.
 
 \textbf{Visual Studio Code (VS Code):} Made by Microsoft, free, and extremely popular in the broader software development community (though not required). It is a general-purpose programming editor used for many languages. Download from \url{https://code.visualstudio.com/}. After installing, you'll need to add the Python extension: click the Extensions icon (four squares) in the sidebar, search for ``Python,'' and install it.
 
-\textbf{No IDE:} A plain old text editor like \texttt{nano}, \texttt{vim}, or Notepad++ is perfectly serviceable. In fact, many scientists eventually work on remote supercomputers or cloud servers where graphical interfaces (like Spyder) aren't available. If you are comfortable editing plain text, you can work anywhere---on a powerful cluster, a colleague's laptop, or even your phone while commuting. The power lies in your code, not the tool used to write it. Challenge yourself to text-editor-only projects from time to time.
+\textbf{No IDE:} A plain old text editor like \texttt{nano}, \texttt{micro}, \texttt{vim}, or Notepad++ is perfectly serviceable. In fact, many scientists eventually work on remote supercomputers or cloud servers where graphical interfaces (like Spyder) aren't available. The ultimate IDE is your own mind. So, if you are comfortable editing plain text, you can work anywhere---on a powerful cluster, a colleague's laptop, or even on paper while commuting. The power lies in your abstractions made code, not the tool used to write it down. Challenge yourself to text-editor-only projects from time to time.
 
 \begin{note}
-VS Code is a generalist tool, whereas Spyder is a specialist. VS Code requires significant manual configuration to match Spyder's out-of-the-box scientific features. I recommend holding off on VS Code until you encounter a specific need that Spyder cannot fulfill.
+VS Code is a generalist tool, whereas Spyder is a specialist. VS Code requires significant manual configuration to match Spyder's out-of-the-box scientific features. I recommend holding off on VS Code until you encounter a specific need that Spyder cannot fulfil.
 \end{note}
 
 % ----------------------------------------------------------------------------
