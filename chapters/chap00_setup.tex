@@ -293,26 +293,43 @@ If you install packages globally (available everywhere on your computer), you ca
 
 \subsection{The Solution}
 
-Virtual environments. Each project gets its own isolated Python environment with its own packages. Project A's environment has NumPy 1.24. Project B's environment has NumPy 1.21. They don't interfere with each other.
+Virtual environments. Each project gets its own isolated Python environment with its own packages. Project A's environment has \py{NumPy} 1.24. Project B's environment has \py{NumPy} 1.21. They don't interfere with each other.
 
 There are several external tools that manage environments (e.g., Conda, Poetry, Pipenv). While I highly recommend looking into \py{uv} (by Astral) once you are comfortable, this book focuses on Python's standard, built-in tools. Mastering these first ensures you understand the core mechanics without needing to install extra software, and provides the foundation needed to effectively use power tools like \py{uv} later.
 
 \subsection{Creating a Virtual Environment}
 
-Use the terminal's \emph{change directory} command (\py{cd}) to navigate to your project folder. Simply type \py{cd}, a space, and the path (see Section~\ref{sec:paths}) to your destination:
+First, we need a place for your project to live. Instead of switching back to your file explorer and clicking around, we can do this directly from the terminal.
 
-\begin{lstlisting}[style=shellstyle]
-cd Documents/python_projects/learning
-\end{lstlisting}
+\begin{enumerate}
+    \item \textbf{Navigate} to where you keep your projects (e.g., Documents):
+    \begin{lstlisting}[style=shellstyle]
+    cd Documents
+    \end{lstlisting}
+
+    \item \textbf{Create} a new folder using the \emph{make directory} command (\py{mkdir}):
+    \begin{lstlisting}[style=shellstyle]
+    mkdir learning
+    \end{lstlisting}
+
+    \item \textbf{Enter} the new folder:
+    \begin{lstlisting}[style=shellstyle]
+    cd learning
+    \end{lstlisting}
+\end{enumerate}
+
+\begin{tip}
+Don't type long folder names manually! Type the first few letters (e.g., \py{cd Doc}) and press \textbf{Tab}. The terminal will auto-complete the rest. This prevents typos and makes navigation significantly faster.
+\end{tip}
 
 Create a virtual environment (we'll call it \filepath{venv}):
 
 \begin{lstlisting}[style=shellstyle]
-python -m venv venv         # Windows
-python3 -m venv venv        # macOS/Linux
+python -m venv .venv         # Windows
+python3 -m venv .venv        # macOS/Linux
 \end{lstlisting}
 
-This creates a \filepath{venv} folder containing a private Python installation.
+This tells \py{python} to use a module (\py{-m}) called \py{venv} to create a virtual environment in the folder \filepath{.venv}. This now contains a private Python installation.
 
 \subsection{Activating the Environment}
 
@@ -326,14 +343,18 @@ Before using the environment, you must activate it:
 
 \textbf{Windows (Command Prompt):}
 \begin{lstlisting}[style=shellstyle]
-venv\Scripts\activate.bat
+.venv\Scripts\activate.bat
 \end{lstlisting}
 
 \textbf{macOS/Linux:}
 \begin{lstlisting}[style=shellstyle]
-source venv/bin/activate
+source .venv/bin/activate
 \end{lstlisting}
 \end{osbox}
+
+\begin{note}
+Remeber that our virtual environment folder is called \filepath{.venv} not \filepath{venv}.
+\end{note}
 
 When activated, your prompt changes to show the environment name:
 
@@ -533,9 +554,9 @@ For scientists, I recommend Spyder when you're ready for an IDE. Its variable ex
 
 \textbf{Visual Studio Code (VS Code):} Made by Microsoft, free, and extremely popular. It's a general-purpose programming editor used for many languages. Download from \url{https://code.visualstudio.com/}. After installing, you'll need to add the Python extension: click the Extensions icon (four squares) in the sidebar, search for ``Python,'' and install it.
 
-\begin{warning}
-VS Code is powerful but designed for professional software developers. It has many settings and features that can confuse beginners. For example, it might silently change which Python installation it uses, breaking your code in mysterious ways. The popularity of VS Code means you'll find lots of online tutorials using it, so it's worth knowing about. But for scientific work, Spyder is usually a better fit.
-\end{warning}
+\begin{note}
+VS Code is a generalist tool, whereas Spyder is a specialist. VS Code requires significant manual configuration to match Spyder's out-of-the-box scientific features. I recommend holding off on VS Code until you encounter a specific need that Spyder cannot fulfill.
+\end{note}
 
 % ----------------------------------------------------------------------------
 \section{Chapter Summary}
