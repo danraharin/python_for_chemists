@@ -272,8 +272,19 @@ To exit the REPL, simply use the exit function with no input:
 Or press Ctrl+D (macOS/Linux) or Ctrl+Z then Enter (Windows).
 
 \begin{ponder}
-What happens if you type \py{print(Hello)} without the quotes? Try it and read the error message. Why does Python complain?
+What happens if you type \py{print(Hello)} without the quotes? Try it and read the error message in the last line of the output, it should start with \py{NameError}. Why does Python complain? Come up with a hypothesis test it, or read on to understand.
 \end{ponder}
+
+\begin{tip}
+Develop a ``mental model'' of Python. Your goal is to reach a point where you can reliably predict: \textit{``If I provide this input, the system must produce that output.''} True competence is measured by your ability to read code and understand its behavior without needing to run it.
+
+As a scientist, you already do this with physical systems. Programming is simply the act of learning the laws of a new, purely logical universe. While humans built Python, the formal logic it requires is often foreign to our natural way of thinking; as humans, we are wired for intuition and heuristics, which is why we commit logical fallacies by default. Python exists in a world of absolute literalism where your intent is irrelevant and only your definitions matter.
+
+Because of this, the world of programming will initially feel alien. You are a visitor to a foreign land, but remember: you are welcome and you belong. Take your time to find joy, to experiment, and to observe. If a result surprises you, it simply means your mental model is incomplete. This is not a failure; in fact, your model is never expected to be perfect. Use surprise as an opportunity to learn, not as a sign that you do not belong.
+
+To that end, it is okay for things to not work. If you keep running into walls, take a break. Allow your neurons the time to form the new synapses and strengthen the pathways that will let you solve the same problem with ease a day later. The frustration of repeated failure is like the ache of muscles after exercise; give yourself the time to heal and grow. Sleep is a functional part of the debugging process. I have had countless breakthroughs happen in dreams. However, this also means that last-minute coding is a doomed strategy.
+\end{tip}
+
 
 % ----------------------------------------------------------------------------
 \section{Virtual Environments}
