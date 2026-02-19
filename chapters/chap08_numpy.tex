@@ -508,7 +508,7 @@ pip install numba
 \end{lstlisting}
 
 \subsection{How Numba Works}
-
+\label{sec:Numba}
 Numba uses JIT (Just-In-Time) compilation. You decorate (recall Section~\ref{sec:decorators-dataclasses}) a function with \py{@numba.jit}, and Numba converts it to compiled code the first time you call it. Subsequent calls run at compiled speed. The catch: Numba only works with NumPy arrays and basic Python operations. Complex features like classes or dictionary look-ups won't compile.
 
 \subsection{A Comprehensive Example: Molecular Reactions}

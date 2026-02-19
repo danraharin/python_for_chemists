@@ -124,7 +124,39 @@ It is tempting to view AI as a productivity multiplier, but in skill acquisition
 
 Writing a script manually might take four hours; with AI, forty minutes. But if the manual process taught you to recognise array broadcasting errors, you have gained velocity---the next similar task takes thirty minutes regardless of AI assistance. If you skipped the struggle, you remain dependent on the tool for identical tasks forever.
 
-\textit{Slow is smooth, and smooth is fast.} Master the concept at a pace that allows comprehension, \textit{then} use AI to accelerate implementation of what you genuinely understand.
+\textit{Slow is smooth, and smooth is fast.} Master the concept at a pace that allows comprehension, \textit{then} use AI to accelerate implementation of what you genuinely understand. While AI can provide speed but YOU provide direction. Without your intentional direction guiding things, with AI you are simply directionless faster.
+
+\subsubsection*{A Case Study in Confident Failure of LLMs}
+
+While writing this book, as an exercise an LLM (Claude 4.5 Haiku, and Claude 4.6 Opus) were asked to produce performance comparisons like those in Section~\ref{sec:Numba}: four implementations of a simplified bimolecular reaction simulation (pure Python, unvectorized NumPy, vectorized NumPy, and Numba). The model produced plausible code and confidently declared vectorized NumPy the fastest. The initial timings appeared to confirm this. What followed was an instructive series of failures---not one mistake, but a chain of them, each requiring domain expertise to diagnose and resolve.
+
+\medskip
+\noindent\textbf{Act 1: The Hidden Bug.} The vectorized implementation computed pairwise distances between all molecules, but failed to exclude the matrix diagonal---the distance from each molecule to \emph{itself}, which is always zero. Every molecule ``reacted with itself'' on the first timestep, marking all 500 molecules as reacted instantly. The function then skipped the expensive distance computation for the remaining 9,999 timesteps, producing the illusion of speed (finishing in less than 0.01 seconds). None of this was obvious at a glance from the code alone; and the output \emph{looked} approximately correct.
+
+It took careful proofing to catch the discrepancy: why did vectorized NumPy always report exactly 500 molecules reacted, while the other methods varied around 475$\pm$10 of 500? The model, when confronted with this inconsistency, initially blamed different random number generators, then suggested other irrelevant changes. Only after explicit, repeated, and pointed prompting about the distance matrix diagonal did it identify that issue. A practitioner with domain experience would likely not have made this error, and would easily have caught this during code review---excluding self-interactions in pairwise computations is not exotic; it is a basic requirement.
+
+\medskip
+\noindent\textbf{Act 2: The Overcorrection.} With the diagonal fixed (\py{np.fill\_diagonal(distances, np.inf)}), vectorized NumPy became the \emph{slowest} approach: 68 seconds vs.\ 1.6 for Numba. The model had constructed an entire pedagogical narrative around this finding, and recommended sweeping changes the book. However, the reason was straightforward: the vectorized version allocated a full 500$\times$500 distance matrix at every time-step, while the loop-based versions skipped already-reacted molecules with \py{continue}, so their workload shrank over time. The model missed this entirely, because understanding \emph{why} an algorithm is slow requires reasoning about memory allocation patterns and workload dynamics---not just pattern-matching against common advice. If a LLM considers these factors or not in an answer is really a matter of luck. Without specific prompting to bring these factors into it's attention is fairly unlikely to be consistently addressed.
+
+\medskip
+\noindent\textbf{Act 3: The Fix the Model Couldn't Find.} The solution was to subset to only active (unreacted) molecules before computing the distance matrix, so that the array shrank as molecules reacted. This brought vectorized NumPy to $\sim$1 second---still the fastest single-invocation approach, but at a more reasonable margin. All fixes and optimisations had to be suggested by the human, otherwise would be missed by models. It requires understanding of \emph{both} the algorithmic structure (pairwise computations on a shrinking set) \emph{and} NumPy's performance characteristics (small array operations are fast; huge allocations are expensive). The model's repeated failure to suggest this---despite it being a natural and well-known pattern---illustrates how brittle AI can be even with simply domain shifts. There are other domains where this kind of thing is far more commonplace and so I doubt a LLM coding assistant would ever make a mistake such as this.
+
+\medskip
+Several things are worth noting:
+
+\begin{enumerate}
+    \item The cascade was insidious: a subtle bug produced plausible timings, which were used to construct a compelling but false narrative. Each layer of interpretation moved further from the underlying error, making it harder to trace back. At every stage, the model's output \emph{read} convincingly.
+    \item Even after the bug was found, getting the right answer required a second insight---the active subsetting optimisation---that the model did not volunteer. Fixing one error does not guarantee correctness; it often reveals the next layer of complexity.
+    \item The bug was not exotic. Excluding self-interactions and subsetting active particles are standard considerations in any pairwise simulation. The model lacked the physical intuition to catch the first and the performance intuition to suggest the second.
+    \item At every stage, it took human domain expertise to drive improvement and correction. The model provides syntax; the human provides understanding.
+	\item Using AI it took close to two hours and all of a days worth of a session limit's worth of tokens to reproduce what took 20 minutes to write otherwise. This would likely have been faster had full scope of problem been supplied in the initial query (making sure to ignore diagonal for reactions, managing memory and throughput by masking matrix)
+\end{enumerate}
+
+This illustrates a fundamental asymmetry. LLMs perform best on well-documented, widely-discussed problems. As you approach the specifics of your work---novel analyses, unusual data structures, domain-specific edge cases---the model's training data thins out, and the probability of confident but incorrect output increases. This is precisely where your expertise matters most, and precisely where uncritical delegation is most dangerous.
+
+\begin{ponder}
+The closer your work is to the cutting edge of your field, the less likely it is that a sufficiently capable model exists to handle it reliably. At that point, the only thing that can catch the errors is your own domain knowledge. How do you develop that knowledge if you delegate the work that would build it?
+\end{ponder}
 
 \begin{warning}
 \textbf{Reputation and Ownership} \\
