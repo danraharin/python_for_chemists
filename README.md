@@ -8,6 +8,7 @@
 - [ ] make sure all concepts introduced are shown incorporated in a lab example presented in the same chapter as they were introduced
 - [ ] Continue looking for verbose chunks to make more concise
 - [ ] Keep polishing to align better with proposed contribution values
+- [ ] remove hardcoded python from text, into python files that are inserted to text via \input, this way we can test scripts and outputs, among other benefits.
 
 # Python and Computational Thinking: A Crash Course for Scientists
 
