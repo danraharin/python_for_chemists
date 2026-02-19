@@ -148,14 +148,12 @@ versus:
 Both calculate the same result, but the second version explains itself. Anyone reading it (including future you) understands what's happening.
 
 \begin{warning}
-Avoid single-letter variable names except in very short code blocks or when they match mathematical notation you're implementing. The characters you save aren't worth the confusion.
-\end{warning}
+Avoid using "magic numbers." In the examples above, if we had written \py{conc = 5.85 / 58.44 / 0.5}, it would be use of "Magic Numbers." Unexplained constants that appear out of nowhere. 
 
-\begin{warning}
-\textbf{Avoid "Magic Numbers"}
-In the example above, if we had written \py{conc = 5.85 / 58.44 / 0.5}, those numbers are called "Magic Numbers"---unexplained constants that appear out of nowhere.
+A number without a name is dangerous. Is \py{0.5} the volume? The concentration? A correction factor? By assigning \py{volume_L = 0.5}, you give that number semantic meaning.
 
-To a programmer, a number without a name is dangerous. Is \py{0.5} the volume? The concentration? A correction factor? By assigning \py{volume_L = 0.5}, you give that number semantic meaning. You aren't just doing arithmetic; you are defining the physics of your simulation.
+
+You can learn from this warning, or from experience. How you learn this lesson is up to you, but you will learn it.
 \end{warning}
 
 % ----------------------------------------------------------------------------
@@ -199,16 +197,8 @@ Floats have limited precision. They are stored in binary, and some decimal numbe
 >>> 0.1 + 0.2
 0.30000000000000004
 \end{lstlisting}
-This isn't a Python bug---it's how computers work. This matters because checking for exact equality will return \py{False} when you expect \py{True}:
-\begin{lstlisting}
->>> total = 0.1 + 0.2
->>> total == 0.3
-False
->>> round(total, 5) == 0.3	# Safer way: round before comparing
-True
-\end{lstlisting}
+This isn't a Python bug---it's how computers work. This matters because checking for exact equality will return \py{False} when you expect \py{True} if you don't account for this.
 \end{warning}
-
 
 \subsection{Strings (str)}
 
@@ -324,7 +314,7 @@ Python cannot guess that "hello" is not a number. Similarly, \py{float("1.5 kg")
 \textbf{The Helping Hand}
 When Python crashes and a wall of red text appears, do not panic. Your instinct might be to flinch, interpreting the error as a strike against your competence.
 
-I urge you to view it differently: see it not as a hand raised to strike, but as a hand reaching out to pull you up. Great programmers don't write code that never breaks—to err is human. Instead, they are simply willing to take the hand that is offered. The traceback is a specific guide on how to resolve the misunderstanding between your intent and the computer's strict logic.
+I urge you to view it differently: see it not as a hand raised to strike, but as a hand reaching out to pull you up. Great programmers don't write code that never breaks---to err is human. Instead, they are simply willing to take the hand that is offered. The traceback is a specific guide on how to resolve the misunderstanding between your intent and the computer's strict logic.
 \end{tip}
 
 \begin{ponder}
@@ -574,6 +564,10 @@ For scientific work, you'll rarely use \py{input()}---data comes from files inst
 % ----------------------------------------------------------------------------
 \section{Writing Your First Script}
 \label{sec:first-script}
+
+\begin{warning}
+If you skipped ahead during the introductory chapter, now is a good time to revisit it, starting with section~\ref{sec:hygiene}. At minimum you need to read section~\ref{sec:editor}.
+\end{warning}
 
 Let's combine what we've learned into a script. Create a file called \filepath{molarity.py}. You could do this any number of ways; easiest is likely to open your editor of choice and save a file of this name in an appropriate location (recall hygiene rules from Chapter 0):
 
