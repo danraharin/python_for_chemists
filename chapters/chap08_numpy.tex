@@ -432,9 +432,37 @@ np.savez("multiple.npz", wavelengths=wl, absorbances=ab)
 loaded = np.load("multiple.npz")
 print(loaded["wavelengths"])
 \end{lstlisting}
-
 % ----------------------------------------------------------------------------
-\section{Common Patterns}
+\section{Einstein Summation}
+\label{subsec:einsum}
+
+One of NumPy's most powerful (and often overlooked) tools is \py{np.einsum}. This function uses Einstein summation notation to represent many common array operations using a short string of letters. It is an advanced skill to developed, and is mostly added here to let you know it exists.
+
+The notation identifies the axes of the input arrays with letters. If a letter appears in the input but not the output, that axis is summed over.
+
+\begin{lstlisting}
+a = np.array([1, 2, 3])
+b = np.array([10, 20, 30])
+A = np.arange(6).reshape(2, 3)
+
+# Dot product: sum(a_i * b_i) -> output is scalar
+np.einsum('i,i', a, b)       # 140
+
+# Matrix-vector multiplication: sum(A_ij * a_j) -> output is vector (i)
+np.einsum('ij,j->i', A, a)   # array([ 8, 26])
+
+# Sum all elements in a matrix
+np.einsum('ij->', A)         # 15
+
+# Transpose
+np.einsum('ij->ji', A)       # Same as A.T
+\end{lstlisting}
+
+\begin{tip}
+While \py{np.einsum} can be intimidating at first, it is often more memory-efficient than standard operations because it avoids creating intermediate temporary arrays. If you find yourself nesting multiple \py{np.reshape}, \py{np.transpose}, and \py{np.dot} calls, \py{einsum} is likely the cleaner solution and worth the effort learning. For a deep dive into the logic of indices, I highly recommend exploring the official \href{https://numpy.org/doc/stable/reference/generated/numpy.einsum.html}{NumPy documentation} on the topic.
+\end{tip}
+% ----------------------------------------------------------------------------
+\section{Examples of Common Patterns}
 \label{sec:numpy-patterns}
 
 \subsection{Normalize Data}
@@ -442,7 +470,7 @@ print(loaded["wavelengths"])
 \begin{lstlisting}
 data = np.array([10, 20, 30, 40, 50])
 
-# Scale to 0-1
+# Scale to 0-1 (MinMax Scaling)
 normalized = (data - data.min()) / (data.max() - data.min())
 
 # Z-score normalization
@@ -469,36 +497,7 @@ print(f"Peaks at indices: {peaks}")
 \end{lstlisting}
 
 % ----------------------------------------------------------------------------
-\subsection{Einstein Summation: \texttt{np.einsum}}
-\label{subsec:einsum}
-
-One of NumPy's most powerful (and often overlooked) tools is \py{np.einsum}. This function uses \emph{Einstein summation notation} to represent many common array operations using a short string of letters. It is an advanced skill to developed, and is mostly added here to let you know it exists.
-
-The notation identifies the axes of the input arrays with letters. If a letter appears in the input but not the output, that axis is summed over.
-
-\begin{lstlisting}
-a = np.array([1, 2, 3])
-b = np.array([10, 20, 30])
-A = np.arange(6).reshape(2, 3)
-
-# Dot product: sum(a_i * b_i) -> output is scalar
-np.einsum('i,i', a, b)       # 140
-
-# Matrix-vector multiplication: sum(A_ij * a_j) -> output is vector (i)
-np.einsum('ij,j->i', A, a)   # array([ 8, 26])
-
-# Sum all elements in a matrix
-np.einsum('ij->', A)         # 15
-
-# Transpose
-np.einsum('ij->ji', A)       # Same as A.T
-\end{lstlisting}
-
-\begin{tip}
-While \py{np.einsum} can be intimidating at first, it is often more memory-efficient than standard operations because it avoids creating intermediate temporary arrays. If you find yourself nesting multiple \py{np.reshape}, \py{np.transpose}, and \py{np.dot} calls, \py{einsum} is likely the cleaner solution and worth the effort learning. For a deep dive into the logic of indices, I highly recommend exploring the official \href{https://numpy.org/doc/stable/reference/generated/numpy.einsum.html}{NumPy documentation} on the topic.
-\end{tip}
-
-% ----------------------------------------------------------------------------
+\newpage
 \section{When Vectorization Isn't An Option: Numba}
 \label{sec:numba}
 
@@ -804,6 +803,7 @@ NumPy is essential for scientific computing:
     \item \textbf{Aggregation:} \py{np.sum()}, \py{np.mean()}, \py{np.std()}
     \item \textbf{Linear algebra:} \py{@} or \py{np.dot()}, \py{np.linalg.solve()}
     \item \textbf{Reshaping:} \py{.reshape()}, \py{.T}, \py{np.vstack()}
+    \item \textbf{Einsum Notation:} for more complex operations
     \item \textbf{Numba:} \py{@jit(nopython=True)} compiles loop-heavy code to machine code---ideal when vectorization is too complex or when amortising compilation cost across repeated calls
 \end{itemize}
 
