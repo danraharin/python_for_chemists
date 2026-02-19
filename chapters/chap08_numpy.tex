@@ -1,7 +1,7 @@
 % chap08_numpy.tex - Numerical computing with NumPy
 % ============================================================================
 
-\chapter{NumPy: Numerical Computing}
+\chapter{NumPy \& Numba: High Speed Numerical Computing}
 \label{chap:numpy}
 
 Python lists are flexible but slow for numerical work. NumPy (Numerical Python) provides arrays---efficient containers for numerical data---and fast operations on them. NumPy is the foundation of scientific Python; virtually every scientific library builds on it. You can install it from your terminal, preferably with a virtual environment active, via:
@@ -469,6 +469,298 @@ print(f"Peaks at indices: {peaks}")
 \end{lstlisting}
 
 % ----------------------------------------------------------------------------
+\section{When Vectorization Isn't An Option: Numba}
+\label{sec:numba}
+
+NumPy's vectorization is powerful, but some algorithms resist vectorization, or perhaps you are unsure of how to vectorize your logic. Perhaps you need nested loops that depend on previous results, or complex branching logic that doesn't map to array operations. In these cases \py{Numba} may offer you some performance gains. It compiles your Python code to machine code on-the-fly, giving you C-like speed while writing Python. The first step of a loop is therefore slow, but subsequent steps are blazing fast, so for long-running loops it can really add up. You can install it with:
+
+\begin{lstlisting}[style=shellstyle]
+pip install numba
+\end{lstlisting}
+
+\subsection{How Numba Works}
+
+Numba uses JIT (Just-In-Time) compilation. You decorate (recall Section~\ref{sec:decorators-dataclasses}) a function with \py{@numba.jit}, and Numba converts it to compiled code the first time you call it. Subsequent calls run at compiled speed. The catch: Numba only works with NumPy arrays and basic Python operations. Complex features like classes or dictionary look-ups won't compile.
+
+\subsection{A Comprehensive Example: Molecular Reactions}
+
+Let's simulate a system of molecules diffusing and reacting upon collision. In this model, we assume that any unreacted molecule will react if it gets close enough to another unreacted molecule during a timestep. Importantly, because we evaluate the entire system before updating any states, molecules can react in clusters. This means if one molecule is near several others simultaneously, they will all react together. This requires checking the distances between all pairs and updating the reactions synchronously at the end of the timestep. This is logic that can be vectorized, but it still serves as an excellent proving ground for alternative optimization approaches. 
+
+Over the new few pages you will see four approaches, each required to show the complete picture. To begin, you'll need to import the following:
+
+\begin{lstlisting}
+import math
+import random
+import time
+import numpy as np
+from numba import jit
+\end{lstlisting}
+
+\begin{note}
+The specific chemical simulation explored here serves as a vehicle to demonstrate performance differences. If the physical chemistry of diffusing molecules doesn't align with your exact interests, you need not worry, it is not imperative to understand every line of the loop logic. However, if you do wish to follow along, I have included detailed comments to help guide you. 
+
+The key lessons to take away from the following examples are:
+
+\begin{itemize}
+    \item \py{NumPy} is not automatically faster just by importing it; unvectorized array access can actually slow you down.
+    \item Vectorization can be unintuitive and filled with contextual pitfalls, making it hard to offer universal "rules of thumb" for.
+    \item Numba provides an excellent middle ground, by allowing you to write straightforward and readable loops while achieving lightning-fast compiled execution speeds.
+\end{itemize}
+\end{note}
+
+\newpage 
+\noindent \textbf{Example 1: Pure Python with Lists}
+\begin{lstlisting}
+def react_pure_python(n_molecules, time_steps, react_distance):
+
+	# Randomly initialise positions
+    pos = [[random.random() * 100, random.random() * 100] for _ in range(n_molecules)]
+	
+	# Mark all molecules as un-reacted
+    reacted = [False] * n_molecules
+
+	
+    for t in range(time_steps):
+        # Diffusion, everything steps in a random direction a small amount
+        random_steps = [random.gauss(0, 0.1) for _ in range(n_molecules * 2)]
+        for i in range(n_molecules):
+            pos[i][0] += random_steps[i * 2]
+            pos[i][1] += random_steps[i * 2 + 1]
+
+        # Track the reactions for this timestep
+        new_reacted = [False] * n_molecules
+        for i in range(n_molecules):
+            if reacted[i]: continue
+            for j in range(i + 1, n_molecules):
+                if reacted[j]: continue
+                
+                dx = pos[i][0] - pos[j][0]
+                dy = pos[i][1] - pos[j][1]
+                dist = math.sqrt(dx*dx + dy*dy)
+                
+                if dist < react_distance:
+                    new_reacted[i] = True
+                    new_reacted[j] = True
+
+        # Synchronous update: Apply all reactions at end of timestep
+        for k in range(n_molecules):
+            if new_reacted[k]:
+                reacted[k] = True
+
+    return sum(reacted)
+
+start = time.time()
+result = react_pure_python(n_molecules=500, time_steps=10_000, react_distance=2.0)
+print(f"Pure Python (lists): {time.time() - start:.2f} seconds ({result} reacted)")
+\end{lstlisting}
+
+\noindent On a typical machine: \textbf{6-10 seconds}. Baseline performance with interpreted Python.
+
+\newpage 
+\noindent \textbf{Example 2: NumPy (Unvectorized --- Same loop but with \py{Numpy} arrays)}
+
+\begin{lstlisting}
+def react_numpy_unvectorized(n_molecules, time_steps, react_distance):
+    """Unvectorized: NumPy arrays, but same loop structure as pure Python."""
+    pos = np.random.rand(n_molecules, 2) * 100
+    reacted = np.zeros(n_molecules, dtype=np.bool_)
+
+    for t in range(time_steps):
+        # Diffusion (batch generation)
+        pos += np.random.randn(n_molecules, 2) * 0.1
+
+        # Track reactions for this timestep
+        new_reacted = np.zeros(n_molecules, dtype=np.bool_)
+        for i in range(n_molecules):
+            if reacted[i]: continue
+            for j in range(i + 1, n_molecules):
+                if reacted[j]: continue
+                
+                dx = pos[i, 0] - pos[j, 0]
+                dy = pos[i, 1] - pos[j, 1]
+                dist = np.sqrt(dx*dx + dy*dy)
+                
+                if dist < react_distance:
+                    new_reacted[i] = True
+                    new_reacted[j] = True
+
+        # Synchronous update
+        reacted |= new_reacted
+
+    return np.sum(reacted)
+
+start = time.time()
+result = react_numpy_unvectorized(n_molecules=500, time_steps=10_000, react_distance=2.0)
+print(f"NumPy (unvectorized): {time.time() - start:.2f} seconds ({result} reacted)")
+\end{lstlisting}
+
+\noindent On a typical machine: \textbf{15-29 seconds}. Slower than pure Python! NumPy without vectorization can actually be slower due to array access overhead in tight loops. Clearly we can't simply assume using NumPy makes our code faster.
+
+\newpage 
+\noindent \textbf{Example 3: NumPy (Vectorized --- Better NumPy Usage)}
+
+\begin{lstlisting}
+def react_numpy_vectorized(n_molecules, time_steps, react_distance):
+    """Vectorized: compute all pairwise distances at once."""
+    pos = np.random.rand(n_molecules, 2) * 100
+    reacted = np.zeros(n_molecules, dtype=np.bool_)
+
+    for t in range(time_steps):
+        # Diffusion (vectorized)
+        pos += np.random.randn(n_molecules, 2) * 0.1
+
+        # Reactions (vectorized distance matrix)
+        if not np.all(reacted):
+            active_indices = np.where(~reacted)[0]
+            active_pos = pos[active_indices]
+            
+            # Compute distances for active molecules only
+            diff = active_pos[:, np.newaxis, :] - active_pos[np.newaxis, :, :]
+            distances = np.sqrt(np.sum(diff**2, axis=2))
+
+            # Diagonal matrix trick to ignore self-interaction (distance 0)
+            np.fill_diagonal(distances, np.inf) 
+
+            # Find which rows in the SUBSET have a neighbor within distance
+            reacting_in_subset = np.any(distances < react_distance, axis=1)
+
+            # Map those subset results back to the original 'reacted' array
+            # This is inherently synchronous
+            reacted[active_indices[reacting_in_subset]] = True
+
+    return np.sum(reacted)
+
+start = time.time()
+result = react_numpy_vectorized(n_molecules=500, time_steps=10_000, react_distance=2.0)
+print(f"NumPy (vectorized): {time.time() - start:.2f} seconds ({result} reacted)")
+
+\end{lstlisting}
+
+\noindent On a typical machine: \textbf{$\approx$1 second}. There are two main tricks here to make it all work: the first is to prevent self-interaction, and the second is to shrink the distance matrix by dropping molecules that are done. Without applying both tricks, the answers will either be wrong or take much longer than the other methods ($>$ 1 minute). While this example is still somewhat simple, vectorizing more complex processes that we can easily describe using built-in Python logic can become quite a headache. So, what if we want speed, but don't want to undertake an entire mathematics degree to get it? Well, we can explore example four:
+
+\newpage 
+\noindent \textbf{Example 4: NumPy + Numba (Compiled Unvectorized)}
+
+\begin{lstlisting}
+@jit(nopython=True)
+def react_numba(n_molecules, time_steps, react_distance):
+    """Compiled: Numba accelerates the unvectorized loop logic."""
+    pos = np.random.rand(n_molecules, 2) * 100
+    reacted = np.zeros(n_molecules, dtype=np.bool_)
+
+    # Pre-allocate outside the loop for maximum C-level performance
+    new_reacted = np.zeros(n_molecules, dtype=np.bool_)
+
+    for t in range(time_steps):
+        # Diffusion
+        pos += np.random.randn(n_molecules, 2) * 0.1
+
+        # Reset the temporary array for this timestep
+        new_reacted.fill(False)
+        
+        for i in range(n_molecules):
+            if reacted[i]: continue
+            for j in range(i + 1, n_molecules):
+                if reacted[j]: continue
+                
+                dx = pos[i, 0] - pos[j, 0]
+                dy = pos[i, 1] - pos[j, 1]
+                dist = np.sqrt(dx*dx + dy*dy)
+                
+                if dist < react_distance:
+                    new_reacted[i] = True
+                    new_reacted[j] = True
+
+        # Synchronous update
+        for k in range(n_molecules):
+            if new_reacted[k]:
+                reacted[k] = True
+
+    return np.sum(reacted)
+
+# Warmup run to hide JIT compilation time in benchmarks (uncomment the line below for a no-overhead estimate)
+#react_numba(n_molecules=10, time_steps=1, react_distance=2.0)
+
+start = time.time()
+result = react_numba(n_molecules=500, time_steps=10_000, react_distance=2.0)
+print(f"Numba (compiled, warmed-up): {time.time() - start:.2f} seconds ({result} reacted)")
+\end{lstlisting}
+
+\noindent On a typical machine: \textbf{1-2 seconds} with the cold-start compilation overhead, or \textbf{$<$0.45 seconds} if warmed up (see the commented-out warmup call above). The first invocation includes the cost of compiling to machine code; subsequent calls run at compiled speed. For a one-off script, vectorized NumPy edges ahead because there is no compilation penalty. For repeated calls---parameter sweeps, Monte Carlo studies, interactive analysis---Numba's compiled speed dominates once the initial cost is paid. Both are roughly \textbf{10x faster} than pure Python, but they achieve it differently: NumPy eliminates loops through array operations, Numba keeps the loops but compiles them to machine code.
+
+\begin{note}
+\textbf{The Complete Picture (real timings, 500 molecules, 10,000 timesteps):}
+\begin{itemize}
+    \item \textbf{Pure Python (lists):} $\sim$10 seconds --- baseline interpreted Python
+    \item \textbf{NumPy unvectorized:} $\sim$17 seconds --- \emph{slower} than pure Python due to array access overhead in tight loops
+    \item \textbf{NumPy vectorized:} $\sim$1 second --- fast, when done carefully (see Section~\ref{sec:ai-usage} for what happens when it isn't)
+    \item \textbf{Numba compiled:} $\sim$1.7 seconds cold-start, $\sim$\textbf{0.4 seconds} warmed up
+\end{itemize}
+
+\textbf{Key lessons:}
+\begin{enumerate}
+    \item \textbf{Vectorization wins when done thoughtfully.} But ``thoughtfully'' is doing a lot of work in that sentence. Getting the vectorized example right required excluding self-interactions, subsetting to active molecules, and understanding the memory implications. The naive version was the \emph{slowest} of all four approaches.
+    \item \textbf{Numba is the pragmatic choice} when vectorization is too complex or when you need repeated calls. Write straightforward loops, add a decorator, and get compiled speed.
+    \item Using NumPy without vectorization is \textbf{worse than not using NumPy at all.} Array element access in Python loops carries overhead that raw Python lists avoid.
+    \item \textbf{Understanding your problem determines the right tool.} There is no universal hierarchy---the best approach depends on problem structure, call frequency, and how much time you are willing to invest in getting the implementation right.
+\end{enumerate}
+\end{note}
+
+\begin{tip}
+\textbf{Best Practices for Numba Compatibility}
+
+Numba compiles Python to machine code, but not all Python features are supported. Keep your code simple to avoid compilation errors:
+
+\begin{itemize}
+    \item \textbf{Use basic loops and conditionals} --- \py{for}, \py{while}, \py{if}/\py{else} work great. Avoid Python's functional tools (\py{map}, \py{filter}, \py{lambda}).
+
+    \item \textbf{Pre-allocate arrays, don't append} --- Numba doesn't support dynamic lists. Use \py{np.empty()} and track indices (as in our kinetics example), rather than appending.
+
+    \item \textbf{Stick to basic NumPy operations} --- Use array indexing, arithmetic, and functions like \py{np.sqrt()}, \py{np.sum()}. Avoid fancy indexing or complicated reshape logic.
+
+    \item \textbf{Avoid strings and dictionaries} --- These don't compile. No string operations, no dictionary lookups, no print statements in compiled code.
+
+    \item \textbf{Use \py{nopython=True}} --- Force Numba to compile or raise an error immediately, rather than silently falling back to slow Python mode: \py{@jit(nopython=True)}.
+
+    \item \textbf{Test your algorithm without Numba first} --- Get the logic right in pure Python, then add the decorator. Python errors are clearer than Numba compilation errors.
+\end{itemize}
+
+When in doubt, keep the code as simple as possible. Numba works best on straightforward, loop-heavy code using NumPy arrays and basic math.
+\end{tip}
+
+\subsection{When to Use Numba}
+
+Use Numba when:
+\begin{itemize}
+    \item You have loops over NumPy arrays that can't be vectorized
+    \item The logic is complex (nested loops, conditionals, sequential dependencies)
+    \item Speed matters (simulation, expensive analysis)
+\end{itemize}
+
+Don't use Numba when:
+\begin{itemize}
+    \item Your code already uses NumPy vectorization well
+    \item The bottleneck is I/O or calling external libraries
+    \item You need Python-only features (classes, dictionaries, dynamic types)
+\end{itemize}
+
+\begin{tip}
+Always profile before optimizing. Use the \py{time} module or \py{timeit} to measure. As we saw above, ``using NumPy'' does not automatically mean ``fast''---the unvectorized NumPy example was slower than pure Python. Similarly, getting vectorization right took careful thought about subsetting and self-interactions. Measure first, understand the problem, optimize second.
+\end{tip}
+
+\begin{warning}
+Because Numba resulted in such a dramatic speedup for our collision simulation, it is tempting to conclude that Numba is a consistent upgrade. This is absolutely false. There are many scenarios where pure, vectorized NumPy is significantly faster than anything you can write in Numba:
+
+\begin{itemize}
+    \item \textbf{Reinventing the Wheel (Sorting and Searching):} It is incredibly common for beginners to write custom loops to sort an array, find unique values, or search for a specific threshold. However, built-in functions like \py{np.sort()}, \py{np.unique()}, and \py{np.searchsorted()} are backed by highly optimized C algorithms. Compiling your own sorting loop with Numba will almost certainly be slower than just calling NumPy's native version.
+    \item \textbf{Complex Aggregations:} If you find yourself writing a loop to bin data into a histogram, compute a cumulative sum, or find the median across a specific axis, check the documentation first. Functions like \py{np.histogram()}, \py{np.cumsum()}, and \py{np.median()} already operate at peak hardware efficiency.
+    \item \textbf{Heavy Linear Algebra:} Operations like matrix multiplication (\py{A @ B}), matrix inversions, and eigenvalue decompositions are handed off by NumPy to heavily optimized, multi-threaded external libraries (like OpenBLAS or Intel MKL). A Numba-compiled \py{for} loop cannot compete with decades of hardware-specific tuning.
+\end{itemize}
+
+\textbf{The golden rule:} If NumPy already has a dedicated function for exactly what you want to do, use it! Only reach for Numba when you have custom, complex, or branching iterative logic (like tracking states over time) that resists standard vectorization.
+\end{warning}
+
+% ----------------------------------------------------------------------------
 \section{Chapter Summary}
 \label{sec:numpy-summary}
 
@@ -482,6 +774,7 @@ NumPy is essential for scientific computing:
     \item \textbf{Aggregation:} \py{np.sum()}, \py{np.mean()}, \py{np.std()}
     \item \textbf{Linear algebra:} \py{@} or \py{np.dot()}, \py{np.linalg.solve()}
     \item \textbf{Reshaping:} \py{.reshape()}, \py{.T}, \py{np.vstack()}
+    \item \textbf{Numba:} \py{@jit(nopython=True)} compiles loop-heavy code to machine code---ideal when vectorization is too complex or when amortising compilation cost across repeated calls
 \end{itemize}
 
 \begin{ponder}
