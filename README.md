@@ -1,13 +1,27 @@
 # TODO
-- [ ] cover einsum notation and numba for making pyrhon kogic fast (possibly both under numpy, or maybe do numba seperately?)
-- [ ] improve installation instructions, things are ambiguous atm, make clearer conceptual splits and be clearer about when something is theory and when students should follow along with something. It should be clear when we are mentioning things that exist, which student's don't need to do right now (e.g. installing jupyter etc) vs what needs to be done to be ready for the next chapter (have a python interpreter of an appropriate version, 3.10+, installed). Perhaps I should add screenshots of what some things like REPL look like in the first chapter?
-- [ ] Add more explanations for some things, e.g. in chap00_setup.tex under subsection "Activating the Environment" for the warning starting with "If you get an error about “execution policies” on Windows PowerShell, run this command first (as administrator):" I got this comment "I'm not sure what this means" with a line pointing at the word administrator. So perhaps we need explain it? or just recommend using regular command prompt instead?
+- [ ] Continue improving intro section / getting started. Awaiting feedback for draft version 3 (see releases for this verison)
+- [ ] Improve layout (low prio but needs doing before first real release)
+   - [ ] Fix how admonition boxes break
+   - [ ] Fix how admonition boxes float
+- [ ] add quizes to the end of chapters to make use of new quiz tool
+- [ ] check all admonitions still belong to correct categories
+- [ ] make sure all concepts introduced are shown incorporated in a lab example presented in the same chapter as they were introduced
+- [ ] Continue looking for verbose chunks to make more concise
+- [ ] Keep polishing to align better with proposed contribution values
 
 # Python and Computational Thinking: A Crash Course for Scientists
 
-A comprehensive LaTeX book teaching Python programming to scientists with no prior programming experience.
+A comprehensive LaTeX book geared towards teaching Python programming to scientists with no prior programming experience. Examples focus on chemistry, but lessons translate well beyond the sciences.
 
-## Building the PDF
+## Accessing the PDF
+
+Simply grab the PDF from the latest release on the github repository.
+
+## Using the Quiz tool
+
+This is in the process of being implemented, but will work by simply downloading the script and running it in your python environment. It doesn't require any special pckages, but will use hashing to check quiz answers in order to auto-mark, providing students with automatic feedback on their learning without providing the ability to use back of book style cheating.
+
+## Building the PDF from source
 
 ### Prerequisites
 
@@ -17,11 +31,12 @@ You need a LaTeX distribution with the following packages:
 - Standard packages: `listings`, `hyperref`, `xcolor`, `geometry`, `amsmath`, `graphicx`, `booktabs`
 
 **Recommended distributions:**
-- **Windows:** MiKTeX or TeX Live
-- **macOS:** MacTeX
+- **Windows:** TeX Live
+- **macOS:** MacTeX (LLM recommendation, quick websearch supports but this point would benfit from verificaiton)
 - **Linux:** TeX Live (`sudo apt install texlive-full` on Ubuntu/Debian)
 
 ### Build Commands
+After cloning the repository:
 
 **Simple build (run twice for table of contents):**
 ```bash
@@ -33,13 +48,49 @@ pdflatex main.tex
 ```bash
 latexmk -pdf main.tex
 ```
+---
 
-**Clean auxiliary files:**
-```bash
-latexmk -c
-```
+**Questions for contributors?** Check the repository issues or reach out. The goal is to make this the first stop in every scientists journey into learning to use python, and you are an integral part of this.
 
-## File Organization
+---
+
+# Contributing
+
+## Core Philosophy
+
+This textbook aims to keep pace with modern Python programming while remaining faithful to several foundational ideals about how scientists should learn to code.
+
+### Presentation & Pedagogy
+
+This textbook presents Python through **authentic scientific problems**, not abstract exercises. Every concept is introduced with a "why"—what real research question does this solve?—before the "how." We move deliberately from foundations (setup, basics, control flow) through essential skills (functions, file I/O, error handling) to scientific computing libraries (NumPy, Pandas, Matplotlib), building up a coherent mental model at each step.
+
+Code examples are currently anchored in chemistry, but physics and biology examples are equally welcome. As an example, when introducing object-oriented programming, we avoid abstract cataloging ("Encapsulation, Abstraction, Inheritance, Polymorphism"). Instead, readers need practical intuition for *how to use a class*, awareness of unintuitive behaviors that will bite them, and an honest appraisal that their understanding is surface-level. We equip them with essential skills, point them toward deeper learning, and move on.
+
+### Scope: Trunk and Branches
+
+This textbook is intentionally focused. It serves as the **trunk** of a tree—the foundational knowledge every scientist-programmer needs. Topics like neural networks in chemistry, molecular dynamics simulations, or advanced statistical modeling are better served as **branches**: supplementary handbooks and specialized texts that readers are well-equipped to navigate *after* mastering this core material.
+
+We resist the temptation to be comprehensive. Instead, we ask: "Will a novice programmer need this to become productive in scientific Python?" If the answer is no, it belongs in a specialized branch, not here. This keeps the book focused, digestible, and genuinely teachable. Readers who climb the trunk first will find themselves in an entirely new landscape, able to explore whatever branches suit their research. We should trust in our readers ability to continue to self-develop.
+
+### Didactic Approach
+
+We teach **understanding over memorization**. Chapters include "Ponder" blocks that encourage readers to think critically about unexpected behaviors (like why `0.1 + 0.2 ≠ 0.3`), fostering the scientific habit of questioning results and independently investigating to fill knowledge gaps. We emphasize **defensive practices from the start**—error handling, testing, and reproducibility aren't afterthoughts but integral parts of good programming.
+
+Importantly, we acknowledge the emotional and cognitive dimensions of learning: we normalize struggle, celebrate debugging as a path to insight, and reframe error messages as guides rather than indictments. We're honest that learning to program takes time, and that's not a personal failing—it's how your brain forms new mental models.
+
+### Core Values for Contributors
+
+Any contributions should maintain these principles:
+
+1. **Relevance** — Wherever possible, connect concepts to real scientific workflows, not toy problems or contrived examples.
+2. **Narrative clarity** — Explain *why* a practice matters before teaching *how* to implement it. Motivation comes first.
+3. **Integrity** — Acknowledge limitations, edge cases, and performance trade-offs rather than glossing over them. Honesty builds trust.
+4. **Accessibility** — Assume readers are domain experts in their science but novices in programming. Build appropriate scaffolding.
+5. **Practicality** — Minimize or exclude coverage of topics not in direct service of building practical skills or preventing harm. Keep scope tight; resist feature creep.
+
+Finally, remember that code is ultimately written for humans—your future self, collaborators, reviewers. Every addition should honor that principle. Code should be readily interpreted by novices with an grasp of English, who have read this book up to that point. If the prior chapters in the book to not make something clear, it is out of place.
+
+### File Organization
 
 ```
 python_for_scientists/
@@ -59,8 +110,9 @@ python_for_scientists/
 └── README.md               # This file
 ```
 
-## Adding New Chapters
+### Adding New Chapters
 
+0. Consider if a new chapter is _really_ needed here, or if it might fit into a handbook better?
 1. Create a new file in `chapters/` following the naming convention: `chapNN_topic.tex`
 2. Use the standard chapter structure:
    ```latex
@@ -82,7 +134,7 @@ python_for_scientists/
    \input{chapters/chapNN_topic}
    ```
 
-## Custom Environments
+### Custom Environments
 
 The preamble defines several admonition boxes:
 
@@ -112,7 +164,7 @@ Reflection questions at end of sections.
 \end{ponder}
 ```
 
-## Code Listing Styles
+### Code Listing Styles
 
 Three styles are available:
 
@@ -147,5 +199,5 @@ Inline code commands:
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Author
-
+(currently)
 Frithjof Herb
