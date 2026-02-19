@@ -201,5 +201,8 @@ Inline code commands:
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Author
-(currently)
 Frithjof Herb
+
+# Generative AI statment
+
+Generative AI has been used throughout the production of this text, however everything is scruitinized by humans with the required domain expertise to do so. The post mortem in the closing remarks chapter gives insight into what this looks like.
