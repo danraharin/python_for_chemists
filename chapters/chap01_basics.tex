@@ -4,9 +4,11 @@
 \chapter{Python Basics}
 \label{chap:basics}
 
-With Python installed, let's learn the language. We call Python a ``programming language'' because, like English or German, it has vocabulary (words with specific meanings), grammar (rules for combining words), and syntax (rules for punctuation and structure). The difference is that Python is designed to be translated into instructions a computer can execute, while still being readable by humans. This is what makes programming accessible: you write something that looks vaguely like English, and the computer knows what to do.
+A computer is, at its heart, a \textbf{calculator}---a machine that takes in data, follows instructions, and produces results. That's it. Every app, game, and website you've ever used is just a very elaborate sequence of instructions applied to data.
 
-This chapter covers the fundamental building blocks: how to store values, what types of data exist, and how to combine them into \emph{expressions} (pieces of code that produce a value, like \py{2 + 3}). Everything else builds on this foundation.
+\textbf{Python} is a way to write those instructions in something close to plain English. When you type Python code, you are telling the calculator exactly \textit{what} data to work with and \textit{how} to work with it.
+
+This means the very first thing you need to understand is: \textbf{what kinds of data can Python work with, and how does it organise that data?} Python has several built-in types for holding individual values (numbers, text, true/false), and several \textbf{data structures} for holding collections of values (lists, dictionaries, sets). We'll start with the primitive types in this chapter, then tackle containers in Chapter~\ref{chap:containers}. Trust me: you'll want to understand both, because almost every interesting problem involves \textit{collections} of values---a list of temperatures, a mapping from postcodes to suburbs, a set of unique identifiers.
 
 Open Python in interactive mode (type \shell{python} or \shell{python3} in your terminal). We'll experiment in the REPL first, then move to scripts.
 
