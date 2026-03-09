@@ -52,21 +52,6 @@ Python has additional arithmetic operators:
 
 Integer division (\py{//}) discards the decimal part. Modulo (\py{\%}) gives the remainder. Exponentiation (\py{**}) raises a number to a power.
 
-\begin{labexample}
-Molarity calculation: You dissolved 5.85 grams of NaCl (molar mass 58.44 g/mol) in water and diluted to 500 mL. What's the concentration?
-
-\begin{lstlisting}
->>> mass_g = 5.85
->>> molar_mass = 58.44
->>> volume_L = 0.5
->>> concentration = mass_g / molar_mass / volume_L
->>> concentration
-0.20020533881587955
-\end{lstlisting}
-
-About 0.2 M. We'll learn how to format this nicely soon.
-\end{labexample}
-
 \subsection{Order of Operations}
 
 Python follows standard mathematical precedence: parentheses first, then exponentiation, then multiplication/division, then addition/subtraction.
@@ -100,6 +85,21 @@ Typing numbers directly gets tedious. Variables let you store values and refer t
 \end{lstlisting}
 
 The \py{=} sign is assignment: it stores the value on the right in the name on the left. This is not a mathematical equation---it's an instruction to put a value somewhere.
+
+\begin{labexample}
+Molarity calculation: You dissolved 5.85 grams of NaCl (molar mass 58.44 g/mol) in water and diluted to 500 mL. What's the concentration?
+
+\begin{lstlisting}
+>>> mass_g = 5.85
+>>> molar_mass = 58.44
+>>> volume_L = 0.5
+>>> concentration = mass_g / molar_mass / volume_L
+>>> concentration
+0.20020533881587955
+\end{lstlisting}
+
+About 0.2 M. We'll learn how to format this nicely soon.
+\end{labexample}
 
 \begin{lstlisting}
 >>> x = 5
